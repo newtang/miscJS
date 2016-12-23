@@ -1,0 +1,33 @@
+<script>
+//print permutations of string.
+function perm(str){
+	if(str.length === 1){
+		return [str];
+	}
+
+	var results = [];
+	var chars = str.split("");
+	for(var i=0, len=chars.length; i<len; ++i){
+		var curChar = chars.splice(0 ,1)[0];
+		/*
+		if(str === "abcd"){
+			console.log(curChar);
+			console.log(chars);
+		}
+		*/
+
+		var subStrArray = perm(chars.join(""));
+		subStrArray.forEach(function(item){
+			results.push(curChar + item);
+		});
+		chars.push(curChar);
+	}
+
+	return results;
+}
+
+var results = perm("abcd");
+console.log(results);
+console.log("results.length: ", results.length);
+
+</script>
