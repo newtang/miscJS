@@ -10,9 +10,8 @@ var graph = [
 ];
 
 function getNeighbors(pnt){
-	var arr = [];
-
-	var xDiff = -1;
+	var arr = [],
+		xDiff = -1;
 
 	while (xDiff <= 1){
 		var yDiff = -1;
@@ -58,30 +57,31 @@ function getHScore(p1, p2){
 	);
 }
 
-function getGScore(p, start){
+function getGScore(start, p){
 	var serialized = serialize(p);
 	if(!gScore[serialized]){
 		var value;
 		if(p[0] === start[0]){
-			value = p[0] - start[0];
+			value = Math.abs(p[1] - start[1]);
 		}
 		else if(p[1] === start[1]){
-			value = p[1] - start[1];
+			value = Math.abs(p[0] - start[0]);
 		}
 		else{
 			var xDiff = Math.abs(p[0] - start[0]),
 				yDiff = Math.abs(p[1] - start[1]);
 
 			if(xDiff <= yDiff){
-				value = (1.5 * xDiff) + yDiff;
+				value = (1.5 * xDiff) + (yDiff -1);
 			}
 			else{
-				value = (1.5 * yDiff) + xDiff;
+				value = (1.5 * yDiff) + (xDiff-1);
 			}
 		}
-		fScore[serialized] = value;
+		//console.log("value", value);
+		gScore[serialized] = value;
 	}
-	return fScore[serialized];
+	return gScore[serialized];
 }
 
 function getFScore(p1, p2){
@@ -111,11 +111,10 @@ var start = p(1,1),
 	fScore = {}, //distance from start
 	gScore = {},
 	openSetHeap = new MinHeap(function(val){
-		return getFScore(val, start);
+		return getFScore(start, val);
 	});
 
 open[serialize(start)] = true;
-console.log('A heap size', openSetHeap.size());
 openSetHeap.insert(start);
 
 gScore[serialize(start)] = 0;
@@ -142,25 +141,38 @@ function aStar(){
 				continue;
 			}
 
-			var tentativeGScore = gScore[currentSerial] + getGScore(current,n);
-			if (tentativeGScore >= gScore[nSerial] ){
+			
+			var tentativeGScore = gScore[currentSerial] + getGScore(current, n);
+			//console.log("tentative", tentativeGScore);
+
+
+
+			if(!open[nSerial]){
+
+				var hScore = getHScore(n, goal);
+				fScore[nSerial] = tentativeGScore + hScore;
+
+
+				open[nSerial] = true;
+				openSetHeap.insert(n);
+
+			}
+			else if (tentativeGScore >= gScore[nSerial] ){
 				continue;
 			}
-			else{
-				cameFrom[nSerial] = current;
-				gScore[nSerial] = tentativeGScore;
-				fScore[nSerial] = tentativeGScore + getHScore(n, goal);
+			
 
-				if(!open[nSerial]){
-					open[nSerial] = true;
-					openSetHeap.insert(n);
-				}
+			cameFrom[nSerial] = current;
+			gScore[nSerial] = tentativeGScore;
 
-			}
+				
+			console.log("-", nSerial, tentativeGScore, "+", hScore, "=", fScore[nSerial]);
+
+
 
 		}
 		console.log(" ");
-
+		console.log("peek", openSetHeap.peek());
 	}
 
 	console.log("Fail");
@@ -183,5 +195,7 @@ function reconstructPath(start, finish){
 console.log("start", start);
 console.log("goal", goal);
 console.log("path: ", aStar());
+
+//console.log("g score 2,2", getGScore(start, p(2,2)))
 
 
