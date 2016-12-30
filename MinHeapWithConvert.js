@@ -39,7 +39,7 @@ MinHeap.prototype.size = function(num){
 MinHeap.prototype._siftUp = function(index){
 	var currValue = this._calcKey(this._arr[index]),
 		parentIndex = this._getParentIndex(index),
-		parentValue = this._arr[parentIndex];
+		parentValue = this._calcKey(this._arr[parentIndex]);
 
 	if(currValue < parentValue){
 		this._swap(index, parentIndex);
@@ -57,7 +57,7 @@ MinHeap.prototype._siftDown = function(index){
 	var leastChildIndex = this._leastChildIndex(leftChildIndex, rightChildIndex);
 
 	if(leastChildIndex !== null){
-		var leastChildValue = this._arr[leastChildIndex];
+		var leastChildValue = this._calcKey(this._arr[leastChildIndex]);
 
 		if(leastChildValue < currValue){
 			this._swap(index, leastChildIndex);
